@@ -1,0 +1,21 @@
+{
+    "exp_name": "mnnist_image_classification",
+    
+    "num_epochs": 10,
+    "batch_size": 16,
+    "learning_rate": 0.001,
+    "dropout": 0.2,
+    "state_size": [784],
+    "max_to_keep":5,
+
+    "compile_loss": "binary_crossentropy",
+    "compile_optimizer": "adam",
+    "compile_metrics": "acc",
+
+    "fit_verbose": 1,
+    "evaluate_verbose": 1,
+    "predict_verbose": 1,
+    "checkpoint_verbose": 1,
+
+    "random_state": 1
+}

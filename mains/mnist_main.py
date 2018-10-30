@@ -1,0 +1,58 @@
+"""
+Execution Flow for the MNIST Classifier
+
+@author: David Curry
+@version: 1.0
+"""
+
+import tensorflow as tf
+
+from data_loader.mnist_data_generator import MnistDataLoader
+from models.mnist_model import MnistModel
+from trainers.mnist_trainer import MnistTrainer
+from utils.config import process_config
+from utils.dirs import create_dirs
+from utils.logger import Logger
+from utils.utils import get_args
+
+
+def main():
+    # capture the config path from the run arguments
+    # then process the json configuration file
+    try:
+        args = get_args()
+        config = process_config(args['config'])
+        
+    except:
+        print("missing or invalid arguments")
+        exit(0)
+        
+    # create the experiments dirs
+    create_dirs([config['summary_dir'], config['checkpoint_dir']])
+    
+    # create tensorflow session
+    sess = tf.Session()
+    
+    # create your data generator
+    data = MnistDataLoader(config)
+    
+    # create an instance of the model you want
+    model = MnistModel(config)
+    
+    # create tensorboard logger
+    logger = Logger(sess, config)
+    
+    # create trainer and pass all the previous components to it
+    print('\nCreating TF Trainer...')
+    trainer = MnistTrainer(sess, model, data, config, logger)
+    
+    #load model if exists
+    #model.load(sess)
+    
+    # here you train your model
+    print('\nTraining TF Model...')
+    trainer.train()
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,23 @@
+{
+    "exp_name": "imdb_seq_classification",
+    
+    "embedding_size": 8,
+    "num_epochs": 2,
+    "num_iter_per_epoch": 10,
+    "learning_rate": 0.001,
+    "dropout": 0.2,
+    "batch_size": 16,
+    "state_size": [784],
+    "max_to_keep":5
+
+    "compile_loss": "binary_crossentropy",
+    "compile_optimizer": "adam",
+    "compile_metrics": "acc",
+
+    "fit_verbose": 1,
+    "evaluate_verbose": 1,
+    "predict_verbose": 1,
+    "checkpoint_verbose": 1,
+
+    "random_state": 1
+}

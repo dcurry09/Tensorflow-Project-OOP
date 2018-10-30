@@ -66,6 +66,8 @@ with tf.Session() as sess:
 
     # initialise the variables
     sess.run(init_op)
+
+    # num batches
     total_batch = int(len(mnist.train.labels) / batch_size)
 
     for epoch in range(epochs):
@@ -73,10 +75,9 @@ with tf.Session() as sess:
     
         for i in range(total_batch):
             batch_x, batch_y = mnist.train.next_batch(batch_size=batch_size)
-            _, c = sess.run([optimiser, cross_entropy], 
-                            feed_dict={x: batch_x, y: batch_y})
+            _, c = sess.run([optimiser, cross_entropy], feed_dict={x: batch_x, y: batch_y})
             avg_cost += c / total_batch
-
+        
         print("Epoch:", (epoch + 1), "cost =", "{:.3f}".format(avg_cost))
 
     print(sess.run(accuracy, feed_dict={x: mnist.test.images, y: mnist.test.labels}))

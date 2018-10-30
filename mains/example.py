@@ -1,8 +1,15 @@
+"""
+Execution Flow for the IMDB Sequence Classifier
+
+@author: David Curry
+@version: 1.0
+"""
+
 import tensorflow as tf
 
-from data_loader.data_generator import DataGenerator
-from models.example_model import ExampleModel
-from trainers.example_trainer import ExampleTrainer
+from data_loader.imdb_data_loader import ImdbDataLoader
+from models.imdb_model import ImdbModel
+from trainers.imdb_trainer import ImdbTrainer
 from utils.config import process_config
 from utils.dirs import create_dirs
 from utils.logger import Logger
@@ -27,16 +34,16 @@ def main():
     sess = tf.Session()
     
     # create your data generator
-    data = DataGenerator(config)
+    data = ImdbDataLoader(config)
     
     # create an instance of the model you want
-    model = ExampleModel(config)
+    model = ImdbModel(config)
     
     # create tensorboard logger
     logger = Logger(sess, config)
     
     # create trainer and pass all the previous components to it
-    trainer = ExampleTrainer(sess, model, data, config, logger)
+    trainer = ImdbTrainer(sess, model, data, config, logger)
 
     #load model if exists
     model.load(sess)
