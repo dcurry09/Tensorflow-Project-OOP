@@ -34,6 +34,8 @@ class MnistModel(BaseModel):
         :raises none
         """
 
+        batch_size = self.config['batch_size']
+        
         self.is_training = tf.placeholder(tf.bool)
         
         # declare the training data placeholders

@@ -50,7 +50,7 @@ class DataLoader(object):
                 self.load_dataset()
                 
                 # Moved to data_loader subclass
-                #self.preprocess_dataset()
+                self.preprocess_dataset()
                 
                 # Moved to data_loader subclass
                 #self.calculate_class_label_size()

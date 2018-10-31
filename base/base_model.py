@@ -34,9 +34,9 @@ class BaseModel:
         :return none
         :raises none
         """
-        print("Saving model...")
+        #print("Saving model...")
         self.saver.save(sess, self.config['checkpoint_dir'], self.global_step_tensor)
-        print("Model saved")
+        #print("Model saved")
 
     def load(self, sess):
         """
@@ -77,7 +77,8 @@ class BaseModel:
         """
         with tf.variable_scope('global_step'):
             self.global_step_tensor = tf.Variable(0, trainable=False, name='global_step')
-
+            #self.increment_global_step_tensor = tf.assign(self.cur_epoch_tensor, self.cur_epoch_tensor + 1)
+            
     def init_saver(self):
         # just copy the following line in your child class
         # self.saver = tf.train.Saver(max_to_keep=self.config.max_to_keep)

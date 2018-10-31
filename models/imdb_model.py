@@ -30,28 +30,53 @@ class ImdbModel(BaseModel):
         """
         Build the Tensorflow model
         
+        NOTICE:
+        We have to pad each sequence to reach 'max_seq_len' for TensorFlow
+        consistency (we cannot feed a numpy array with inconsistent
+        dimensions). The dynamic calculation will then be perform thanks to
+        'seqlen' attribute that records every actual sequence length.
+
         :param self
         :return none
         :raises none
         """
         
         self.is_training = tf.placeholder(tf.bool)
-        
-        self.x = tf.placeholder(tf.float32, shape=[None] + self.config['state_size'])
-        self.y = tf.placeholder(tf.float32, shape=[None, 10])
-        
-        # network architecture
-        d1 = tf.layers.dense(self.x, 512, activation=tf.nn.relu, name="dense1")
-        d2 = tf.layers.dense(d1, 10, name="dense2")
-        
-        with tf.name_scope("loss"):
-            self.cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=self.y, logits=d2))
-            self.train_step = tf.train.AdamOptimizer(self.config['learning_rate']).minimize(self.cross_entropy,
-                                                                                            global_step=self.global_step_tensor)
-            correct_prediction = tf.equal(tf.argmax(d2, 1), tf.argmax(self.y, 1))
-            self.accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
+        batch_size  = self.config['batch_size']
+        max_seq_len = self.config['max_seq_len']
+        lstmUnits   = self.config['n_hidden']
+        
+        # Graph Input
+        self.x = tf.placeholder(tf.int32, shape=[None, max_seq_len])
+        self.y = tf.placeholder(tf.int32, shape=[None, self.config['num_classes']])
+        #self.x = tf.placeholder(tf.int32, shape=[batch_size, max_seq_len])
+        #self.y = tf.placeholder(tf.int32, shape=[batch_size, self.config['num_classes']])
+        
+        # embedding layer
+        word_embeddings = tf.get_variable("word_embeddings", [self.config['vocabulary_size'], self.config['embedding_size']])
+        embedded_data = tf.nn.embedding_lookup(word_embeddings, self.x)
 
+        # build the LSTM cell
+        lstmCell = tf.contrib.rnn.BasicLSTMCell(lstmUnits)
+        #lstmCell = tf.contrib.rnn.DropoutWrapper(cell=lstmCell, output_keep_prob=0.75)
+        value, _ = tf.nn.dynamic_rnn(lstmCell, embedded_data, dtype=tf.float32)
+
+        weight = tf.Variable(tf.truncated_normal([lstmUnits, self.config['num_classes']]))
+        bias = tf.Variable(tf.constant(0.1, shape=[self.config['num_classes']]))
+        value = tf.transpose(value, [1, 0, 2])
+        last = tf.gather(value, int(value.get_shape()[0]) - 1)
+        self.y_ = (tf.matmul(last, weight) + bias)
+
+        # define loss and gradient descent technique
+        self.loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=self.y_, labels=self.y))
+        self.optimizer = tf.train.AdamOptimizer().minimize(self.loss)
+        
+        # define an accuracy assessment operation
+        self.correct_prediction = tf.equal(tf.argmax(self.y, 1), tf.argmax(self.y_, 1))
+        self.accuracy = tf.reduce_mean(tf.cast(self.correct_prediction, tf.float32))
+        
+        
     def init_saver(self):
         """
         Initialize the tensorflow saver that will be used in saving the checkpoints.

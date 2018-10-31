@@ -34,11 +34,13 @@ class BaseTrain:
         :return none
         :raises none
         """
-        for cur_epoch in range(self.model.cur_epoch_tensor.eval(self.sess), self.config['num_epochs'] + 1, 1):
+        #for cur_epoch in range(self.model.cur_epoch_tensor.eval(self.sess), self.config['num_epochs'] + 1, 1):
+        for cur_epoch in range(1, self.config['num_epochs'] + 1, 1):
+            print('Epoch',cur_epoch,'/',self.config['num_epochs'])
             self.train_epoch()
             self.sess.run(self.model.increment_cur_epoch_tensor)
         
-        print(self.sess.run(self.model.accuracy, feed_dict={self.model.x: self.data.mnist.test.images, self.model.y: self.data.mnist.test.labels}))
+        print(self.sess.run(self.model.accuracy, feed_dict={self.model.x: self.data.test_data, self.model.y: self.data.test_labels}))
     
     def train_epoch(self):
         """

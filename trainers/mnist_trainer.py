@@ -67,14 +67,15 @@ class MnistTrainer(BaseTrain):
         - run the tensorflow session
         - return any metrics you need to summarize
         """
-
+        
         # create batches from generator
-        batch_x, batch_y = self.data.mnist.train.next_batch( batch_size = self.config['batch_size'] )
+        batch_x, batch_y = self.data.next_batch( batch_size = self.config['batch_size'] )
         
         # Use TFs feed_dict object
         feed_dict = {self.model.x: batch_x, self.model.y: batch_y}
         
         # train a batch of data
-        _, cost = self.sess.run([self.model.optimiser, self.model.cross_entropy], feed_dict=feed_dict)
+        _, cost = self.sess.run([self.model.optimiser, self.model.loss], feed_dict=feed_dict)
+        #print(cost)
         return cost
     

@@ -45,6 +45,7 @@ class ImdbDataLoader(DataLoader):
                 # num of words in corpus to use
                 self.top_words = 5000
                 (self.train_data, self.train_labels), (self.test_data, self.test_labels) = imdb.load_data(num_words = self.top_words)
+                #print(self.train_data[:5])
                 
         
         def next_batch(self, batch_size):
@@ -55,8 +56,11 @@ class ImdbDataLoader(DataLoader):
                 :returns data from generator of size batch 
                 :raises none
                 """
-                idx = np.random.choice(len(self.train_data), batch_size)
-                yield self.train_data[idx], self.train_labels[idx]
+                num_samples = len(self.train_data)
+                idx = np.random.permutation(num_samples)
+                batches = range(0, num_samples - batch_size + 1, batch_size)
+                for batch in batches:
+                        yield self.train_data[idx[batch:batch + batch_size]], self.train_labels[idx[batch:batch + batch_size]]
                 
         def preprocess_dataset(self):
                 """
@@ -77,8 +81,19 @@ class ImdbDataLoader(DataLoader):
                 self.max_review_length = 500
                 self.train_data = keras.preprocessing.sequence.pad_sequences(self.train_data, maxlen = self.max_review_length)
                 self.test_data  = keras.preprocessing.sequence.pad_sequences(self.test_data, maxlen = self.max_review_length)
-                #print('\nself.test_data:', self.test_data[:5])
+                
 
+                #resize the labels
+                self.train_labels = np.resize(self.train_labels, (len(self.train_labels), 1))
+                self.test_labels = np.resize(self.test_labels, (len(self.test_labels), 1))
+                #print('\nself.test_labels:', self.train_labels[:5])
+
+                # one hot enccode the labels
+                self.train_labels = keras.utils.to_categorical( self.train_labels )
+                self.test_labels  = keras.utils.to_categorical( self.test_labels )
+                #print('\nself.test_labels:', self.train_labels[:5])
+                
+                
                 # normalize data range to 0-1
                 # scaler = MinMaxScaler(feature_range=(0, 1))
                 # scaler = scaler.fit(self.train_data)

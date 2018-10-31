@@ -46,7 +46,7 @@ def main():
     trainer = ImdbTrainer(sess, model, data, config, logger)
 
     #load model if exists
-    model.load(sess)
+    #model.load(sess)
 
     # here you train your model
     trainer.train()

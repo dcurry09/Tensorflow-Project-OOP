@@ -74,3 +74,4 @@ then
     echo "Executing MNIST classifier model with config argument."
     python ./mains/mnist_main.py -c $CONFIG
 fi
+
